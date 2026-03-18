@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Meditation App</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
+body { background:#e9e9f3; display:flex; justify-content:center; }
+.app { width:375px; height:100vh; background:#f6f6fb; border-radius:30px; overflow:hidden; position:relative; display:flex; flex-direction:column; }
+
+/* Screens */
+.screen { display:none; height:100%; overflow-y:auto; padding-bottom:120px;}
+.active { display:block; }
+
+/* Header */
+.header { padding:25px 20px 10px;}
+.title { font-size:22px; font-weight:600; }
+.subtitle { font-size:14px; color:#888; margin-top:5px;}
+
+/* Hero */
+.hero { margin:20px; padding:20px; border-radius:25px; color:white; background:linear-gradient(135deg,#7b6cff,#b29dff); box-shadow:0 15px 40px rgba(123,108,255,0.3);}
+.hero h3{ font-size:18px;}
+.hero p{ font-size:13px; opacity:0.9; margin:8px 0;}
+.hero button{ margin-top:10px; padding:10px 20px; border-radius:20px; border:none; background:white; color:#6c63ff; font-weight:600; cursor:pointer; transition:transform 0.2s;}
+.hero button:hover{ transform:scale(1.05);}
+
+/* Section */
+.section { padding:0 20px; margin-top:10px;}
+.section h4{ margin-bottom:10px; }
+
+/* Category Grid */
+.categories { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.category { background:#f0f0fa; padding:14px; border-radius:16px; font-size:13px; text-align:center; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s; }
+.category:hover, .category.active { background:linear-gradient(135deg,#7b6cff,#b29dff); color:white;}
+.category-icon { font-size:18px; }
+
+/* Player */
+.player { text-align:center; padding-top:20px; display:flex; flex-direction:column; align-items:center;}
+.circle { width:180px; height:180px; margin:20px auto; border-radius:50%; background:radial-gradient(circle,#c3b7ff,#7b6cff); animation:breathe 5s infinite ease-in-out;}
+@keyframes breathe {0%{transform:scale(0.9);opacity:0.6;}50%{transform:scale(1.15);opacity:1;}100%{transform:scale(0.9);opacity:0.6;}}
+.player h2{ font-size:20px; margin:10px 0;}
+.progress-bar{ height:5px; background:#ddd; margin:15px 30px; border-radius:10px;}
+.progress{ height:100%; width:0%; background:#7b6cff; border-radius:10px; transition:width 0.2s;}
+.controls button{ margin:10px; padding:16px; border-radius:50%; border:none; background:#7b6cff; color:white; font-size:16px; cursor:pointer; transition:transform 0.2s;}
+.controls button:hover{ transform:scale(1.1); }
+
+/* Bottom Nav */
+.nav { position:absolute; bottom:0; width:100%; display:flex; justify-content:space-around; padding:15px 0; background:white; border-top:1px solid #eee;}
+.nav button{ border:none; background:none; font-size:12px; color:#888; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; align-items:center;}
+.nav button .nav-icon { font-size:18px; margin-bottom:3px; }
+.nav button.active { color:#6c63ff; font-weight:600; transform:scale(1.1); }
+
+/* Music cards */
+.music-list { display:flex; flex-direction:column; gap:12px; margin:15px 20px; }
+.music-card { background:rgba(123,108,255,0.1); backdrop-filter:blur(10px); padding:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; transition:transform 0.2s;}
+.music-card:hover{ transform:scale(1.03);}
+.play-btn { width:40px; height:40px; border-radius:50%; background:#7b6cff; color:white; display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer; }
+
+/* Empty message */
+.empty-msg { text-align:center; margin-top:50px; color:#aaa; font-size:16px; }
+
+/* Progress Dashboard */
+.progress-dashboard { margin:20px; padding:15px; background:white; border-radius:20px; box-shadow:0 8px 20px rgba(0,0,0,0.05);}
+.progress-dashboard h4 { font-size:16px; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.progress-circle { width:80px; height:80px; border-radius:50%; background:conic-gradient(#7b6cff 0% 65%, #ddd 65% 100%); display:flex; align-items:center; justify-content:center; font-weight:600; color:#6c63ff; margin:10px auto; }
+.progress-info { text-align:center; font-size:14px; color:#555; margin-top:6px; }
+
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HOME -->
+<div class="screen active" id="home">
+  <div class="header">
+    <div class="title">Welcome back</div>
+    <div class="subtitle">Your daily moment of peace awaits</div>
+  </div>
+
+  <div class="hero">
+    <h3>Morning Clarity</h3>
+    <p>Start your day with calm focus</p>
+    <button id="startBtn">Start</button>
+  </div>
+
+  <div class="progress-dashboard">
+    <h4>📅 Today</h4>
+    <div class="progress-circle">25 min</div>
+    <div class="progress-info">Total: 120 sessions</div>
+  </div>
+
+  <div class="section">
+    <h4>Categories</h4>
+    <div class="categories">
+      <div class="category" data-category="all"><span class="category-icon">🔲</span>All</div>
+      <div class="category" data-category="sleep"><span class="category-icon">🌙</span>Sleep</div>
+      <div class="category" data-category="relax"><span class="category-icon">🫁</span>Relax</div>
+      <div class="category" data-category="focus"><span class="category-icon">🎯</span>Focus</div>
+      <div class="category" data-category="anxiety"><span class="category-icon">☁️</span>Anxiety</div>
+      <div class="category" data-category="mindfulness"><span class="category-icon">🌸</span>Mindfulness</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h4>Tracks</h4>
+    <div class="music-list" id="trackList"></div>
+  </div>
+</div>
+
+<!-- SLEEP -->
+<div class="screen" id="sleep">
+  <div class="header"><div class="title">Sleep</div></div>
+  <div class="music-list" id="sleepList"></div>
+</div>
+
+<!-- LIBRARY -->
+<div class="screen" id="library">
+  <div class="header"><div class="title">Library</div></div>
+  <div class="music-list" id="libraryList"></div>
+</div>
+
+<!-- PROFILE -->
+<div class="screen" id="profile">
+  <div class="header"><div class="title">Profile</div></div>
+  <div class="section" style="text-align:center;">
+    <img src="https://i.pravatar.cc/100" style="border-radius:50%; width:100px; height:100px; margin-bottom:12px;">
+    <h3>Jane Doe</h3>
+    <p>jane@example.com</p>
+    <div style="margin-top:10px; font-size:14px; color:#555;">Total Meditations: 120</div>
+    <div style="margin-top:4px; font-size:14px; color:#555; display:flex; align-items:center; justify-content:center; gap:4px;">
+      Favorite Category: <span>🌙 Sleep</span>
+    </div>
+  </div>
+</div>
+
+<!-- PLAYER -->
+<div class="screen" id="player">
+  <div class="player">
+    <h3>Now Playing</h3>
+    <div class="circle"></div>
+    <h2 id="trackTitle">Select a Track</h2>
+    <div class="progress-bar"><div class="progress" id="progress"></div></div>
+    <audio id="audio"></audio>
+    <div class="controls">
+      <button id="prevBtn">⏮</button>
+      <button id="playBtn">▶</button>
+      <button id="pauseBtn">⏸</button>
+      <button id="nextBtn">⏭</button>
+    </div>
+    <button style="margin-top:20px; background:#eee; color:#333; padding:8px 16px; border-radius:12px;" id="backBtn">Back</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button data-target="home"><span class="nav-icon">🏠</span>Home</button>
+  <button data-target="sleep"><span class="nav-icon">🌙</span>Sleep</button>
+  <button data-target="library"><span class="nav-icon">📚</span>Library</button>
+  <button data-target="profile"><span class="nav-icon">👤</span>Profile</button>
+</div>
+
+</div>
+
+<script>
+const audio = document.getElementById("audio");
+const progress = document.getElementById("progress");
+const trackTitle = document.getElementById("trackTitle");
+const trackList = document.getElementById("trackList");
+const sleepList = document.getElementById("sleepList");
+const libraryList = document.getElementById("libraryList");
+
+const musicData = [
+  {title:"Morning Clarity", category:"all", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
+  {title:"Deep Sleep", category:"sleep", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"},
+  {title:"Relaxed Mind", category:"relax", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"},
+  {title:"Focus Boost", category:"focus", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"},
+  {title:"Anxiety Relief", category:"anxiety", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3"},
+  {title:"Mindfulness", category:"mindfulness", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
+];
+
+let currentIndex = 0;
+let filteredTracks = [...musicData];
+
+function goTo(screenId){
+  const target = document.getElementById(screenId);
+  if(!target) return;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  target.classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.nav button[data-target="${screenId}"]`)?.classList.add('active');
+  
+  // Highlight category on home if exists
+  if(screenId==='home') document.querySelectorAll('.category').forEach(c=>c.classList.remove('active'));
+}
+
+function playAudio(){ audio.play(); }
+function pauseAudio(){ audio.pause(); }
+function prevTrack(){ currentIndex=(currentIndex-1+filteredTracks.length)%filteredTracks.length; loadTrack(currentIndex); }
+function nextTrack(){ currentIndex=(currentIndex+1)%filteredTracks.length; loadTrack(currentIndex); }
+function loadTrack(index){
+  const track = filteredTracks[index];
+  if(track){
+    audio.src=track.src;
+    trackTitle.textContent=track.title;
+    audio.play();
+  }
+}
+
+audio.addEventListener("timeupdate",()=>{
+  if(audio.duration) progress.style.width=(audio.currentTime/audio.duration*100)+"%";
+});
+
+function renderTracks(category="all"){
+  filteredTracks = category==="all"? [...musicData] : musicData.filter(t=>t.category===category);
+  
+  trackList.innerHTML="";
+  if(filteredTracks.length===0) trackList.innerHTML='<div class="empty-msg">No tracks available</div>';
+  filteredTracks.forEach((track,index)=>{
+    const card = document.createElement("div");
+    card.className="music-card";
+    card.innerHTML=`<span>${track.title}</span><div class="play-btn">▶</div>`;
+    card.querySelector(".play-btn").addEventListener("click",()=>{ currentIndex=index; loadTrack(currentIndex); goTo('player'); });
+    trackList.appendChild(card);
+  });
+
+  sleepList.innerHTML="";
+  const sleepTracks = musicData.filter(t=>t.category==="sleep");
+  if(sleepTracks.length===0) sleepList.innerHTML='<div class="empty-msg">No sleep tracks</div>';
+  sleepTracks.forEach(track=>{
+    const card = document.createElement("div");
+    card.className="music-card";
+    card.innerHTML=`<span>${track.title}</span><div class="play-btn">▶</div>`;
+    card.querySelector(".play-btn").addEventListener("click",()=>{ currentIndex=musicData.indexOf(track); loadTrack(currentIndex); goTo('player'); });
+    sleepList.appendChild(card);
+  });
+
+  libraryList.innerHTML="";
+  musicData.forEach((track,index)=>{
+    const card = document.createElement("div");
+    card.className="music-card";
+    card.innerHTML=`<span>${track.title}</span><div class="play-btn">▶</div>`;
+    card.querySelector(".play-btn").addEventListener("click",()=>{ currentIndex=index; loadTrack(currentIndex); goTo('player'); });
+    libraryList.appendChild(card);
+  });
+}
+
+document.querySelectorAll(".category").forEach(cat=>{
+  cat.addEventListener("click",()=>{
+    renderTracks(cat.dataset.category);
+    goTo('home');
+    document.querySelectorAll(".category").forEach(c=>c.classList.remove('active'));
+    cat.classList.add('active');
+  });
+});
+
+document.getElementById("startBtn").addEventListener("click",()=>goTo('player'));
+document.querySelectorAll(".nav button").forEach(btn=>btn.addEventListener("click",()=>goTo(btn.dataset.target)));
+
+document.getElementById("playBtn").addEventListener("click", playAudio);
+document.getElementById("pauseBtn").addEventListener("click", pauseAudio);
+document.getElementById("prevBtn").addEventListener("click", prevTrack);
+document.getElementById("nextBtn").addEventListener("click", nextTrack);
+document.getElementById("backBtn").addEventListener("click", ()=>goTo('home'));
+
+renderTracks();
+</script>
+</body>
+</html>
