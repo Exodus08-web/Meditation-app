@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Meditation App</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
 body { background:#e9e9f3; display:flex; justify-content:center; }
-.app { width:375px; height:100vh; background:#f6f6fb; border-radius:30px; overflow:hidden; position:relative; display:flex; flex-direction:column; }
+.app { width:100%; max-width:375px; height:100vh; background:#f6f6fb; border-radius:30px; overflow:hidden; position:relative; display:flex; flex-direction:column; }
 
 /* Screens */
-.screen { display:none; height:100%; overflow-y:auto; padding-bottom:120px;}
-.active { display:block; }
+.screen { display:none; height:100%; overflow-y:auto; padding-bottom:120px; flex-direction:column; }
+.active { display:flex; }
 
 /* Header */
 .header { padding:25px 20px 10px;}
@@ -65,30 +66,34 @@ body { background:#e9e9f3; display:flex; justify-content:center; }
 .progress-circle { width:80px; height:80px; border-radius:50%; background:conic-gradient(#7b6cff 0% 65%, #ddd 65% 100%); display:flex; align-items:center; justify-content:center; font-weight:600; color:#6c63ff; margin:10px auto; }
 .progress-info { text-align:center; font-size:14px; color:#555; margin-top:6px; }
 
+@media(max-width:350px){
+  .title { font-size:20px; }
+  .subtitle { font-size:12px; }
+  .hero h3 { font-size:16px; }
+  .hero p { font-size:11px; }
+  .categories { grid-template-columns:repeat(2,1fr); }
+}
 </style>
 </head>
 <body>
 <div class="app">
-
+<!-- All screens same as before -->
 <!-- HOME -->
 <div class="screen active" id="home">
   <div class="header">
     <div class="title">Welcome back</div>
     <div class="subtitle">Your daily moment of peace awaits</div>
   </div>
-
   <div class="hero">
     <h3>Morning Clarity</h3>
     <p>Start your day with calm focus</p>
     <button id="startBtn">Start</button>
   </div>
-
   <div class="progress-dashboard">
     <h4>📅 Today</h4>
     <div class="progress-circle">25 min</div>
     <div class="progress-info">Total: 120 sessions</div>
   </div>
-
   <div class="section">
     <h4>Categories</h4>
     <div class="categories">
@@ -100,7 +105,6 @@ body { background:#e9e9f3; display:flex; justify-content:center; }
       <div class="category" data-category="mindfulness"><span class="category-icon">🌸</span>Mindfulness</div>
     </div>
   </div>
-
   <div class="section">
     <h4>Tracks</h4>
     <div class="music-list" id="trackList"></div>
@@ -189,7 +193,6 @@ function goTo(screenId){
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
   document.querySelector(`.nav button[data-target="${screenId}"]`)?.classList.add('active');
   
-  // Highlight category on home if exists
   if(screenId==='home') document.querySelectorAll('.category').forEach(c=>c.classList.remove('active'));
 }
 
@@ -210,12 +213,10 @@ audio.addEventListener("timeupdate",()=>{
   if(audio.duration) progress.style.width=(audio.currentTime/audio.duration*100)+"%";
 });
 
-function renderTracks(category="all"){
-  filteredTracks = category==="all"? [...musicData] : musicData.filter(t=>t.category===category);
-  
+function renderTracks(){
+  // Home
   trackList.innerHTML="";
-  if(filteredTracks.length===0) trackList.innerHTML='<div class="empty-msg">No tracks available</div>';
-  filteredTracks.forEach((track,index)=>{
+  musicData.forEach((track,index)=>{
     const card = document.createElement("div");
     card.className="music-card";
     card.innerHTML=`<span>${track.title}</span><div class="play-btn">▶</div>`;
@@ -223,9 +224,9 @@ function renderTracks(category="all"){
     trackList.appendChild(card);
   });
 
+  // Sleep
   sleepList.innerHTML="";
   const sleepTracks = musicData.filter(t=>t.category==="sleep");
-  if(sleepTracks.length===0) sleepList.innerHTML='<div class="empty-msg">No sleep tracks</div>';
   sleepTracks.forEach(track=>{
     const card = document.createElement("div");
     card.className="music-card";
@@ -234,6 +235,7 @@ function renderTracks(category="all"){
     sleepList.appendChild(card);
   });
 
+  // Library
   libraryList.innerHTML="";
   musicData.forEach((track,index)=>{
     const card = document.createElement("div");
@@ -246,8 +248,16 @@ function renderTracks(category="all"){
 
 document.querySelectorAll(".category").forEach(cat=>{
   cat.addEventListener("click",()=>{
-    renderTracks(cat.dataset.category);
-    goTo('home');
+    const category = cat.dataset.category;
+    const filtered = category==="all"? musicData : musicData.filter(t=>t.category===category);
+    trackList.innerHTML="";
+    filtered.forEach((track,index)=>{
+      const card = document.createElement("div");
+      card.className="music-card";
+      card.innerHTML=`<span>${track.title}</span><div class="play-btn">▶</div>`;
+      card.querySelector(".play-btn").addEventListener("click",()=>{ currentIndex=musicData.indexOf(track); loadTrack(currentIndex); goTo('player'); });
+      trackList.appendChild(card);
+    });
     document.querySelectorAll(".category").forEach(c=>c.classList.remove('active'));
     cat.classList.add('active');
   });
@@ -255,7 +265,6 @@ document.querySelectorAll(".category").forEach(cat=>{
 
 document.getElementById("startBtn").addEventListener("click",()=>goTo('player'));
 document.querySelectorAll(".nav button").forEach(btn=>btn.addEventListener("click",()=>goTo(btn.dataset.target)));
-
 document.getElementById("playBtn").addEventListener("click", playAudio);
 document.getElementById("pauseBtn").addEventListener("click", pauseAudio);
 document.getElementById("prevBtn").addEventListener("click", prevTrack);
