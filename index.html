@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meditation App</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
+* { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,sans-serif; }
 body { background:#e9e9f3; display:flex; justify-content:center; }
-.app { width:100%; max-width:375px; height:100vh; background:#f6f6fb; border-radius:30px; overflow:hidden; position:relative; display:flex; flex-direction:column; }
+.app { width:100%; max-width:375px; height:100vh; background:#f6f6fb; border-radius:30px; overflow:hidden; display:flex; flex-direction:column; position:relative; }
 
 /* Screens */
-.screen { display:none; height:100%; overflow-y:auto; padding-bottom:120px; flex-direction:column; }
-.active { display:flex; }
+.screen { display:none; height:100%; overflow-y:auto; padding-bottom:120px;}
+.active { display:block; }
 
 /* Header */
 .header { padding:25px 20px 10px;}
@@ -35,14 +35,24 @@ body { background:#e9e9f3; display:flex; justify-content:center; }
 .category:hover, .category.active { background:linear-gradient(135deg,#7b6cff,#b29dff); color:white;}
 .category-icon { font-size:18px; }
 
+/* Music cards */
+.music-list { display:flex; flex-direction:column; gap:12px; margin:15px 20px; }
+.music-card { background:rgba(123,108,255,0.1); backdrop-filter:blur(10px); padding:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; transition:transform 0.2s;}
+.music-card:hover{ transform:scale(1.03);}
+.play-btn { width:40px; height:40px; border-radius:50%; background:#7b6cff; color:white; display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer; }
+
 /* Player */
 .player { text-align:center; padding-top:20px; display:flex; flex-direction:column; align-items:center;}
 .circle { width:180px; height:180px; margin:20px auto; border-radius:50%; background:radial-gradient(circle,#c3b7ff,#7b6cff); animation:breathe 5s infinite ease-in-out;}
 @keyframes breathe {0%{transform:scale(0.9);opacity:0.6;}50%{transform:scale(1.15);opacity:1;}100%{transform:scale(0.9);opacity:0.6;}}
 .player h2{ font-size:20px; margin:10px 0;}
-.progress-bar{ height:5px; background:#ddd; margin:15px 30px; border-radius:10px;}
-.progress{ height:100%; width:0%; background:#7b6cff; border-radius:10px; transition:width 0.2s;}
-.controls button{ margin:10px; padding:16px; border-radius:50%; border:none; background:#7b6cff; color:white; font-size:16px; cursor:pointer; transition:transform 0.2s;}
+.progress-bar { width:80%; height:6px; background:#ddd; margin:10px auto; border-radius:10px; cursor:pointer; }
+.progress { height:100%; width:0%; background:#7b6cff; border-radius:10px; transition:width 0.2s; }
+.time-display { font-size:12px; color:#555; margin-top:4px; }
+
+/* Controls */
+.controls { display:flex; gap:15px; margin-top:10px; }
+.controls button { width:45px; height:45px; border-radius:50%; border:none; background:#7b6cff; color:white; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.2s; }
 .controls button:hover{ transform:scale(1.1); }
 
 /* Bottom Nav */
@@ -50,12 +60,6 @@ body { background:#e9e9f3; display:flex; justify-content:center; }
 .nav button{ border:none; background:none; font-size:12px; color:#888; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; align-items:center;}
 .nav button .nav-icon { font-size:18px; margin-bottom:3px; }
 .nav button.active { color:#6c63ff; font-weight:600; transform:scale(1.1); }
-
-/* Music cards */
-.music-list { display:flex; flex-direction:column; gap:12px; margin:15px 20px; }
-.music-card { background:rgba(123,108,255,0.1); backdrop-filter:blur(10px); padding:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; transition:transform 0.2s;}
-.music-card:hover{ transform:scale(1.03);}
-.play-btn { width:40px; height:40px; border-radius:50%; background:#7b6cff; color:white; display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer; }
 
 /* Empty message */
 .empty-msg { text-align:center; margin-top:50px; color:#aaa; font-size:16px; }
@@ -66,34 +70,46 @@ body { background:#e9e9f3; display:flex; justify-content:center; }
 .progress-circle { width:80px; height:80px; border-radius:50%; background:conic-gradient(#7b6cff 0% 65%, #ddd 65% 100%); display:flex; align-items:center; justify-content:center; font-weight:600; color:#6c63ff; margin:10px auto; }
 .progress-info { text-align:center; font-size:14px; color:#555; margin-top:6px; }
 
-@media(max-width:350px){
-  .title { font-size:20px; }
-  .subtitle { font-size:12px; }
-  .hero h3 { font-size:16px; }
-  .hero p { font-size:11px; }
-  .categories { grid-template-columns:repeat(2,1fr); }
-}
+/* Calendar */
+.calendar { display:flex; flex-direction:column; align-items:center; margin:15px 20px; }
+.calendar-header { display:flex; justify-content:space-between; width:100%; margin-bottom:10px; }
+.calendar-days { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.calendar-day { width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:6px; cursor:pointer; }
+.calendar-day.today { background:#7b6cff; color:white; }
+.calendar-day:hover { background:#b29dff; color:white; }
 </style>
 </head>
 <body>
 <div class="app">
-<!-- All screens same as before -->
+
 <!-- HOME -->
 <div class="screen active" id="home">
   <div class="header">
     <div class="title">Welcome back</div>
     <div class="subtitle">Your daily moment of peace awaits</div>
   </div>
+
   <div class="hero">
     <h3>Morning Clarity</h3>
     <p>Start your day with calm focus</p>
     <button id="startBtn">Start</button>
   </div>
+
   <div class="progress-dashboard">
     <h4>📅 Today</h4>
-    <div class="progress-circle">25 min</div>
+    <div class="progress-circle" id="todayProgress">25 min</div>
     <div class="progress-info">Total: 120 sessions</div>
   </div>
+
+  <div class="calendar" id="calendar">
+    <div class="calendar-header">
+      <button id="prevMonth">&lt;</button>
+      <div id="monthYear"></div>
+      <button id="nextMonth">&gt;</button>
+    </div>
+    <div class="calendar-days" id="calendarDays"></div>
+  </div>
+
   <div class="section">
     <h4>Categories</h4>
     <div class="categories">
@@ -105,6 +121,7 @@ body { background:#e9e9f3; display:flex; justify-content:center; }
       <div class="category" data-category="mindfulness"><span class="category-icon">🌸</span>Mindfulness</div>
     </div>
   </div>
+
   <div class="section">
     <h4>Tracks</h4>
     <div class="music-list" id="trackList"></div>
@@ -143,7 +160,8 @@ body { background:#e9e9f3; display:flex; justify-content:center; }
     <h3>Now Playing</h3>
     <div class="circle"></div>
     <h2 id="trackTitle">Select a Track</h2>
-    <div class="progress-bar"><div class="progress" id="progress"></div></div>
+    <div class="progress-bar" id="playerProgressBar"><div class="progress" id="progress"></div></div>
+    <div class="time-display"><span id="currentTime">00:00</span> / <span id="duration">00:00</span></div>
     <audio id="audio"></audio>
     <div class="controls">
       <button id="prevBtn">⏮</button>
@@ -163,8 +181,6 @@ body { background:#e9e9f3; display:flex; justify-content:center; }
   <button data-target="profile"><span class="nav-icon">👤</span>Profile</button>
 </div>
 
-</div>
-
 <script>
 const audio = document.getElementById("audio");
 const progress = document.getElementById("progress");
@@ -172,6 +188,9 @@ const trackTitle = document.getElementById("trackTitle");
 const trackList = document.getElementById("trackList");
 const sleepList = document.getElementById("sleepList");
 const libraryList = document.getElementById("libraryList");
+const currentTimeEl = document.getElementById("currentTime");
+const durationEl = document.getElementById("duration");
+const playerProgressBar = document.getElementById("playerProgressBar");
 
 const musicData = [
   {title:"Morning Clarity", category:"all", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
@@ -185,17 +204,17 @@ const musicData = [
 let currentIndex = 0;
 let filteredTracks = [...musicData];
 
+/* --- Navigation --- */
 function goTo(screenId){
-  const target = document.getElementById(screenId);
-  if(!target) return;
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  target.classList.add('active');
+  const target = document.getElementById(screenId);
+  if(target) target.classList.add('active');
+
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
   document.querySelector(`.nav button[data-target="${screenId}"]`)?.classList.add('active');
-  
-  if(screenId==='home') document.querySelectorAll('.category').forEach(c=>c.classList.remove('active'));
 }
 
+/* --- Audio Player --- */
 function playAudio(){ audio.play(); }
 function pauseAudio(){ audio.pause(); }
 function prevTrack(){ currentIndex=(currentIndex-1+filteredTracks.length)%filteredTracks.length; loadTrack(currentIndex); }
@@ -203,75 +222,127 @@ function nextTrack(){ currentIndex=(currentIndex+1)%filteredTracks.length; loadT
 function loadTrack(index){
   const track = filteredTracks[index];
   if(track){
-    audio.src=track.src;
-    trackTitle.textContent=track.title;
+    audio.src = track.src;
+    trackTitle.textContent = track.title;
     audio.play();
   }
 }
-
-audio.addEventListener("timeupdate",()=>{
-  if(audio.duration) progress.style.width=(audio.currentTime/audio.duration*100)+"%";
+audio.addEventListener("timeupdate", ()=>{
+  if(audio.duration){
+    progress.style.width = (audio.currentTime/audio.duration*100)+"%";
+    const cmin = Math.floor(audio.currentTime/60); const csec = Math.floor(audio.currentTime%60);
+    const dmin = Math.floor(audio.duration/60); const dsec = Math.floor(audio.duration%60);
+    currentTimeEl.textContent = `${String(cmin).padStart(2,'0')}:${String(csec).padStart(2,'0')}`;
+    durationEl.textContent = `${String(dmin).padStart(2,'0')}:${String(dsec).padStart(2,'0')}`;
+  }
+});
+playerProgressBar.addEventListener("click", (e)=>{
+  const rect = playerProgressBar.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const width = rect.width;
+  audio.currentTime = (clickX/width) * audio.duration;
 });
 
-function renderTracks(){
-  // Home
-  trackList.innerHTML="";
-  musicData.forEach((track,index)=>{
+/* --- Render Tracks --- */
+function renderTracks(category="all"){
+  filteredTracks = category==="all"? [...musicData] : musicData.filter(t=>t.category===category);
+
+  trackList.innerHTML = filteredTracks.length===0?'<div class="empty-msg">No tracks available</div>':'';
+  filteredTracks.forEach((track,index)=>{
     const card = document.createElement("div");
     card.className="music-card";
     card.innerHTML=`<span>${track.title}</span><div class="play-btn">▶</div>`;
-    card.querySelector(".play-btn").addEventListener("click",()=>{ currentIndex=index; loadTrack(currentIndex); goTo('player'); });
+    card.querySelector(".play-btn").addEventListener("click", ()=>{ currentIndex=index; loadTrack(currentIndex); goTo('player'); });
     trackList.appendChild(card);
   });
 
-  // Sleep
-  sleepList.innerHTML="";
-  const sleepTracks = musicData.filter(t=>t.category==="sleep");
-  sleepTracks.forEach(track=>{
+  // Sleep list
+  sleepList.innerHTML = '';
+  musicData.filter(t=>t.category==='sleep').forEach(track=>{
     const card = document.createElement("div");
     card.className="music-card";
     card.innerHTML=`<span>${track.title}</span><div class="play-btn">▶</div>`;
-    card.querySelector(".play-btn").addEventListener("click",()=>{ currentIndex=musicData.indexOf(track); loadTrack(currentIndex); goTo('player'); });
+    card.querySelector(".play-btn").addEventListener("click", ()=>{ currentIndex=musicData.indexOf(track); loadTrack(currentIndex); goTo('player'); });
     sleepList.appendChild(card);
   });
 
   // Library
-  libraryList.innerHTML="";
+  libraryList.innerHTML = '';
   musicData.forEach((track,index)=>{
     const card = document.createElement("div");
     card.className="music-card";
     card.innerHTML=`<span>${track.title}</span><div class="play-btn">▶</div>`;
-    card.querySelector(".play-btn").addEventListener("click",()=>{ currentIndex=index; loadTrack(currentIndex); goTo('player'); });
+    card.querySelector(".play-btn").addEventListener("click", ()=>{ currentIndex=index; loadTrack(currentIndex); goTo('player'); });
     libraryList.appendChild(card);
   });
 }
 
+/* --- Category Buttons --- */
 document.querySelectorAll(".category").forEach(cat=>{
-  cat.addEventListener("click",()=>{
-    const category = cat.dataset.category;
-    const filtered = category==="all"? musicData : musicData.filter(t=>t.category===category);
-    trackList.innerHTML="";
-    filtered.forEach((track,index)=>{
-      const card = document.createElement("div");
-      card.className="music-card";
-      card.innerHTML=`<span>${track.title}</span><div class="play-btn">▶</div>`;
-      card.querySelector(".play-btn").addEventListener("click",()=>{ currentIndex=musicData.indexOf(track); loadTrack(currentIndex); goTo('player'); });
-      trackList.appendChild(card);
-    });
+  cat.addEventListener("click", ()=>{
+    renderTracks(cat.dataset.category);
+    goTo('home');
     document.querySelectorAll(".category").forEach(c=>c.classList.remove('active'));
     cat.classList.add('active');
   });
 });
 
-document.getElementById("startBtn").addEventListener("click",()=>goTo('player'));
-document.querySelectorAll(".nav button").forEach(btn=>btn.addEventListener("click",()=>goTo(btn.dataset.target)));
+/* --- Nav Buttons --- */
+document.querySelectorAll(".nav button").forEach(btn=>btn.addEventListener("click", ()=>goTo(btn.dataset.target)));
+
+/* --- Player Buttons --- */
+document.getElementById("startBtn").addEventListener("click", ()=>goTo('player'));
 document.getElementById("playBtn").addEventListener("click", playAudio);
 document.getElementById("pauseBtn").addEventListener("click", pauseAudio);
 document.getElementById("prevBtn").addEventListener("click", prevTrack);
 document.getElementById("nextBtn").addEventListener("click", nextTrack);
 document.getElementById("backBtn").addEventListener("click", ()=>goTo('home'));
 
+/* --- Calendar --- */
+let today = new Date();
+let currentMonth = today.getMonth();
+
+const monthYear = document.getElementById("monthYear");
+const calendarDays = document.getElementById("calendarDays");
+
+function renderCalendar(month=currentMonth, year=today.getFullYear()){
+  calendarDays.innerHTML = '';
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDate = new Date(year, month+1, 0).getDate();
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  monthYear.textContent = `${monthNames[month]} ${year}`;
+  
+  // Empty slots for first day
+  for(let i=0;i<firstDay;i++){
+    const empty = document.createElement('div');
+    calendarDays.appendChild(empty);
+  }
+
+  for(let d=1; d<=lastDate; d++){
+    const day = document.createElement('div');
+    day.className = 'calendar-day';
+    day.textContent = d;
+    if(d===today.getDate() && month===today.getMonth() && year===today.getFullYear()){
+      day.classList.add('today');
+    }
+    calendarDays.appendChild(day);
+  }
+}
+
+document.getElementById("prevMonth").addEventListener("click", ()=>{
+  currentMonth--;
+  if(currentMonth<0){ currentMonth=11; today.setFullYear(today.getFullYear()-1); }
+  renderCalendar(currentMonth, today.getFullYear());
+});
+document.getElementById("nextMonth").addEventListener("click", ()=>{
+  currentMonth++;
+  if(currentMonth>11){ currentMonth=0; today.setFullYear(today.getFullYear()+1); }
+  renderCalendar(currentMonth, today.getFullYear());
+});
+
+/* --- Initial Render --- */
 renderTracks();
+renderCalendar(currentMonth, today.getFullYear());
 </script>
 </body>
 </html>
